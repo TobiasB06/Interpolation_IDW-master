@@ -1,7 +1,6 @@
 import pandas as pd
 import openpyxl as pxl
 import numpy as np
-
 import pandas as pd
 
 class Excel():
@@ -21,7 +20,6 @@ class Excel():
             # Combina los valores de 'X' y 'Y' en una lista de coordenadas.
             coordinates = list(zip(x_values, y_values))
             coordinates_list.extend(coordinates)
-        print(coordinates_list)
         return coordinates_list
 
 class Interpolation_IDW():
@@ -35,7 +33,7 @@ class Interpolation_IDW():
         for x_interest, y_interest in coordinates_list:
             # Closest points 
             read_data['distancia'] = np.sqrt((read_data['X'] - x_interest)**2 + (read_data['Y'] - y_interest)**2)
-            closest_points = read_data.nsmallest(6, 'distancia')
+            closest_points = read_data.nsmallest(4, 'distancia')
 
             # Main Coefficient for IDW
             p = 2.0
@@ -58,21 +56,31 @@ class Interpolation_IDW():
             z_weights += weight * z[i]
         return z_weights / weights
 
-    def save_to_excel(self, num_rows_per_file=106):
-        for i in range(0, len(self.coordinates_list), num_rows_per_file):
-            subset_coordinates = self.coordinates_list[i:i + num_rows_per_file]
-            subset_z_values = self.interpolated_z_values[i:i + num_rows_per_file]
+    def save_to_excel(self, output_folder,filename):
+        iteration_columns = [col for col in self.df.columns if col.startswith('X')]
+        x_values = [coord[0] for coord in self.coordinates_list]
+        y_values = [coord[1] for coord in self.coordinates_list]
+        z_values = self.interpolated_z_values
+        lista_xyz = list(zip(x_values, y_values, z_values))
 
-            df_result = pd.DataFrame({'X': [coord[0] for coord in subset_coordinates],
-                                    'Y': [coord[1] for coord in subset_coordinates],
-                                    'Z': subset_z_values})
+        for x in range(len(iteration_columns)):
+            iter_values = []
 
-            output_excel = f"Punto_{i//num_rows_per_file}.xlsx"
-            df_result.to_excel(output_excel, index=False)
+            for i in range(x, len(self.coordinates_list), len(iteration_columns)):
+                x_value = lista_xyz[i][0]
+                y_value = lista_xyz[i][1]
+                z_value = lista_xyz[i][2]
+                iter_values.append([x_value, y_value, z_value])
+            df_to_save = pd.DataFrame(iter_values, columns=["X", "Y", "Z"])
+            output_filename = f"{filename}_Grado{x*10}.xlsx"
+            df_to_save.to_excel(output_filename, index=False)
 
 if __name__ == '__main__':
-    excel = Excel("Prueba1.xlsx", 7,"Hoja1")
+    excel = Excel("Archivo_angularesP1.xlsx", 7, "P1-10000")
     coordinates_list = excel.create_coordinates_list()
     interpolation = Interpolation_IDW(excel.df, "GEBCO-UTN-recorte.xyz", coordinates_list)
-    interpolation.save_to_excel()
+    output_folder = "output_data"
+    import os
+    os.makedirs(output_folder, exist_ok=True)
+    interpolation.save_to_excel(output_folder,"Grado")
 

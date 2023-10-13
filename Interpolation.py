@@ -1,11 +1,14 @@
-import pandas as pd
-import openpyxl as pxl
+import tkinter as tk
+import Read_excel
 
-hola = pd.read_excel("Archivo_angularesP1.xlsx", sheet_name="P2-10000", header=6)
-# Obtiene el número de filas y columnas
-num_filas, num_columnas = hola.shape
 
-print(f"El archivo Excel tiene {num_filas} filas de información.")
-iteration_columns = [col for col in hola.columns if col.startswith('X')]
-for i in range(len(iteration_columns)):
-    print(i)
+class Interpolacion_Interfaz():
+    def __init__(self,root):
+        self.root = root
+        self.root.title("Interpolacion")
+        self.root.geometry("400x400")
+        
+if __name__ == '__main__':
+    root1 = tk.Tk()
+    Interpolacion_Interfaz(root1)
+    root1.mainloop()
