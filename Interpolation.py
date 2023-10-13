@@ -6,3 +6,6 @@ hola = pd.read_excel("Archivo_angularesP1.xlsx", sheet_name="P2-10000", header=6
 num_filas, num_columnas = hola.shape
 
 print(f"El archivo Excel tiene {num_filas} filas de información.")
+iteration_columns = [col for col in hola.columns if col.startswith('X')]
+for i in range(len(iteration_columns)):
+    print(i)
