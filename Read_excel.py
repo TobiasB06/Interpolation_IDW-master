@@ -56,7 +56,7 @@ class Interpolation_IDW():
             z_weights += weight * z[i]
         return z_weights / weights
 
-    def save_to_excel(self, output_folder,filename):
+    def save_to_excel(self, output_folder,filename,sheet):
         iteration_columns = [col for col in self.df.columns if col.startswith('X')]
         x_values = [coord[0] for coord in self.coordinates_list]
         y_values = [coord[1] for coord in self.coordinates_list]
@@ -72,7 +72,7 @@ class Interpolation_IDW():
                 z_value = lista_xyz[i][2]
                 iter_values.append([x_value, y_value, z_value])
             df_to_save = pd.DataFrame(iter_values, columns=["X", "Y", "Z"])
-            output_filename = f"{filename}_Grado{x*10}.xlsx"
+            output_filename = f"{output_folder}+_+{sheet}/{filename}_Grado{x*10}.xlsx"
             df_to_save.to_excel(output_filename, index=False)
 
 if __name__ == '__main__':
